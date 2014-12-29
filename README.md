@@ -35,5 +35,8 @@ gets called by upstart on bootup at /etc/init/macfanctld.conf
 /etc/X11/xorg.conf_d / _i
 the config files copied to the default location (xorg.conf or macfanctl.conf)
 
+/var/lib/polkit-1/localauthority/50-local.d/com.ubuntu.enable-hibernate.pkla
+enables hibernation (for me it works flawlessly with complete harddrive lvm encryption)
+
 
 you won't get any virtual terminal if the nvidia blob is loaded. so if something goes pretty wrong you always can boot with the parameter "text". nvidia is blacklisted by default and only gets loaded by gpuboot (without "text" parameter). the blacklist is important because of issues with the 9400M (restarting X without blacklisting first results in corruption - 9600M GT has to be deactivated before loading nvidia - gpuboot and /etc/modprobe.d/nvidia-mbp.conf take care of this)

@@ -1,0 +1,11 @@
+Section "Device"
+	Identifier	"9600M GT"
+	Driver		"nvidia"
+	BusID 		"PCI:2:0:0"
+#	Option		"CustomEDID" "DFP-1:/etc/X11/samsung_wo_ext.bin"
+#	Option		"IgnoreEDID" "false"
+	Option		"NoLogo"	"1"
+	Option		"RegistryDwords" "PowerMizerLevelAC=0x0; PowerMizerLevel=0x3"
+#	Option		"ProbeAllGpus" "false"
+#	Option		"OnDemandVBlankInterrupts" "true"
+EndSection

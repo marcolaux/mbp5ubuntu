@@ -1,0 +1,127 @@
+#!/bin/bash
+
+for ARG in $(cat /proc/cmdline); do
+    if [ "$ARG" = "text" ]; then
+        exit 0
+    fi
+done
+
+function setgpu {
+	if [ "$1" == "i" ]
+	then	
+		echo 1 > /sys/devices/pci0000:00/0000:00:0c.0/0000:02:00.0/remove
+		echo "GPUBOOT: 9600M GT removed"
+		cp /etc/X11/xorg.conf_i /etc/X11/xorg.conf
+		echo "GPUBOOT: xorg.conf_i used"
+		cp /etc/macfanctl.conf_i /etc/macfanctl.conf
+		echo "GPUBOOT: macfanctl.conf_i used"
+		/sbin/igd
+		echo "GPUBOOT: igd executed"
+		#sleep 1
+	#	/sbin/modprobe nvidia; /sbin/modprobe nvidia_uvm; test -c /dev/nvidia-uvm || /usr/bin/mknod -m 660 /dev/nvidia-uvm c $(cat /proc/devices | while read major device; do if [ "$device" == "nvidia-uvm" ]; then echo $major; break; fi ; done) 0 && /usr/bin/chown :video /dev/nvidia-uvm; test -c /dev/nvidiactl || /usr/bin/mknod -m 660 /dev/nvidiactl c 195 255 && chown :video /dev/nvidiactl; test -c /dev/nvidia0 || /usr/bin/mknod -m 660 /dev/nvidia0 c 195 0 && chown :video /dev/nvidia0
+		/sbin/modprobe nvidia_331
+		/sbin/modprobe nvidia-331-uvm	
+		echo "GPUBOOT: nvidia modprobed"
+		/usr/bin/nvidia-smi --id=0 --persistence-mode=1
+		echo "GPUBOOT: nvidia persistence"
+		echo 'auto' > '/sys/bus/pci/devices/0000:03:00.0/power/control'
+		echo "GPUBOOT: power auto"
+
+	elif [ "$1" == "d" ]
+	then
+		echo 'auto' > '/sys/bus/pci/devices/0000:03:00.0/power/control'
+		# echo 1 > /sys/devices/pci0000:00/0000:00:10.0/0000:03:00.0/remove
+		# echo "GPUBOOT: 9400M removed"
+		cp /etc/X11/xorg.conf_d /etc/X11/xorg.conf
+		echo "GPUBOOT: xorg.conf_d used"
+		cp /etc/macfanctl.conf_d /etc/macfanctl.conf
+		echo "GPUBOOT: macfanctl.conf_d used"
+		/sbin/dgd
+		echo "GPUBOOT: dgd executed"
+		#sleep 1
+	#	/sbin/modprobe nvidia; /sbin/modprobe nvidia_uvm; test -c /dev/nvidia-uvm || /usr/bin/mknod -m 660 /dev/nvidia-uvm c $(cat /proc/devices | while read major device; do if [ "$device" == "nvidia-uvm" ]; then echo $major; break; fi ; done) 0 && /usr/bin/chown :video /dev/nvidia-uvm; test -c /dev/nvidiactl || /usr/bin/mknod -m 660 /dev/nvidiactl c 195 255 && chown :video /dev/nvidiactl; test -c /dev/nvidia0 || /usr/bin/mknod -m 660 /dev/nvidia0 c 195 0 && chown :video /dev/nvidia0
+		/sbin/modprobe nvidia_331
+		/sbin/modprobe nvidia-331-uvm
+		echo "GPUBOOT: nvidia modprobed"
+		/usr/bin/nvidia-smi --id=0 --persistence-mode=1
+		echo "GPUBOOT: nvidia persistence"
+		echo 'auto' > '/sys/bus/pci/devices/0000:02:00.0/power/control'
+		echo "GPUBOOT: power auto"
+	else
+		return 0
+	fi
+
+	return 1
+}
+
+gpu="/etc/gpu"
+
+gpunew=""
+FILES="/home/**/.gpunew"
+for f in $FILES
+do
+	if [[ -n "$gpunew" ]]
+	then	
+		if [ "$f" -nt "$gpunew" ]; then
+		    gpunew=$f
+		    actgpu=`cat $gpunew`
+		    rm -f "$gpunew"
+		fi
+	else
+		gpunew=$f
+		actgpu=`cat $gpunew`
+		rm -f "$gpunew"
+	fi
+	# echo "$gpunew"
+done
+
+if [[ -n "$actgpu" ]]
+then
+	echo "GPUBOOT: $gpunew found ($actgpu)"
+	setgpu $actgpu
+	echo "$actgpu" > "/etc/gpu"
+	echo "GPUBOOT: $gpu updated"
+elif [[ -f "$gpu" ]]
+then
+	actgpu=`cat $gpu`
+	echo "GPUBOOT: $gpu found ($actgpu)"
+	setgpu $actgpu
+else
+	echo "GPUBOOT: $gpu not found, do nothing"
+fi
+
+# SELinux NVIDIA
+# restorecon -v /dev/nvidiactl
+# restorecon -v /dev/nvidia0
+
+# echo 1 > /sys/module/hid_apple/parameters/fnmode
+
+# bluetooth
+/usr/sbin/rfkill block bluetooth
+echo "GPUBOOT: disabled bluetooth"
+
+# wlan
+# iw dev wlan0 set power_save on
+# echo 'auto' > '/sys/bus/pci/devices/0000:04:00.0/power/control'
+
+# ethernet
+echo 'auto' > '/sys/bus/pci/devices/0000:00:0a.0/power/control'
+echo "GPUBOOT: ethernet power auto"
+
+# keyboard / trackpad
+echo 'auto' > '/sys/bus/usb/devices/3-6/power/control'
+echo 'auto' > '/sys/bus/usb/devices/4-1.1/power/control'
+echo "GPUBOOT: keyboard and trackpad powersaving"
+
+# IR receiver
+echo 'auto' > '/sys/bus/usb/devices/3-5/power/control'
+echo "GPUBOOT: ir receiver power saving"
+
+# i-sight
+echo 'auto' > '/sys/bus/usb/devices/1-4/power/control'
+echo "GPUBOOT: i-sight powersaving"
+
+# firewire
+echo 'auto' > '/sys/bus/pci/devices/0000:05:00.0/power/control'
+echo "GPUBOOT: firewire power saving"
+

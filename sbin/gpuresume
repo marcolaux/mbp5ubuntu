@@ -1,0 +1,27 @@
+#! /bin/bash
+
+function setgpu {
+	if [ "$1" == "i" ]
+	then
+		echo "GPURESUME: $gpu set as integrated"
+		/sbin/igd
+		echo "GPURESUME: igd executed"
+	elif [ "$1" == "d" ]
+	then
+		echo "GPURESUME: $gpu set as dedicated"
+		/sbin/dgd
+		echo "GPURESUME: dgd executed"
+	else
+		echo "GPURESUME: wrong string in $gpu - please restart changegpu"
+	fi
+}
+
+gpu="/etc/gpu"
+if [ -f "$gpu" ]
+then
+	actgpu=`cat $gpu`
+	echo "GPURESUME: $gpu found ($actgpu)"
+	setgpu $actgpu
+else
+	echo "GPURESUME: $gpu not found, do nothing..."
+fi

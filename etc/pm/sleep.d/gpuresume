@@ -1,0 +1,12 @@
+#! /bin/sh
+
+case $1 in
+     suspend|suspend_hybrid|hibernate)
+	# do nothing
+	:
+        ;;
+     resume|thaw)
+	/sbin/hdparm -B 127 /dev/sdb
+	/sbin/gpuresume
+        ;;
+esac

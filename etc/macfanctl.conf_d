@@ -1,0 +1,29 @@
+# Config file for macfanctl daemon
+#
+# Note: 0 < temp_X_floor < temp_X_ceiling
+#       0 < fan_min < 6200       
+
+fan_min: 2000
+
+temp_avg_floor: 55
+temp_avg_ceiling: 65
+
+temp_TC0D_floor: 70
+temp_TC0D_ceiling: 90
+
+temp_TG0D_floor: 70
+temp_TG0D_ceiling: 90
+
+temp_TN0D_floor: 70
+temp_TN0D_ceiling: 90
+
+# Add sensors to be excluded here, separated by space, i.e.
+# exclude: 8 12
+# will disable reading of sensors temp1_input and temp7_input.
+
+# log_level values:
+#   0: Startup / Exit logging only
+#   1: Basic temp / fan logging
+#   2: Log all sensors  
+
+log_level: 0

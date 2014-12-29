@@ -1,0 +1,60 @@
+#!/bin/bash
+
+function setgpu {
+	if [ "$1" == "i" ]
+	then
+		echo "GPUCHANGE: $gpu set as integrated"
+		changed="i"
+	elif [[ -z "$1" ]]
+	then
+		echo "GPUCHANGE: not specified as parameter, switching"
+		if [ "$actgpu" == "i" ]
+		then
+			echo "GPUCHANGE: $gpu set as dedicated"
+			changed="d"
+		else
+			echo "GPUCHANGE: $gpu set as integrated"
+			changed="i"
+		fi
+	elif [ "$1" == "d" ]
+	then
+		echo "GPUCHANGE: $gpu set as dedicated"
+		changed="d"
+	fi
+}
+
+gpu="/etc/gpu"
+gpunew="${HOME}/.gpunew"
+if [ -f "$gpu" ]
+then
+	actgpu=`cat $gpu`
+	echo "GPUCHANGE: $gpu found ($actgpu)"
+	if [ -f "$gpunew" ]
+	then
+		if [ `cat $gpunew` == "$1" ]
+		then
+			echo "GPUCHANGE: GPU marked to switch since last boot, but user has not rebooted, yet. Your specified GPU ($1) is the same as set before... Please reboot to activate the changes."
+		else
+			echo "GPUCHANGE: GPU marked to switch since last boot, but user has not rebooted, yet. Reverting changes... No reboot required."
+			rm "$gpunew"
+		fi
+		exit 0
+	fi
+	setgpu $1
+else
+	echo "GPUCHANGE: running for the first time or not rebooted since the first run. creating configuration for reboot"
+	echo "i" > "$gpunew"
+	actgpu=""
+	setgpu "i"
+fi
+
+if [ "$actgpu" == "$changed" ]
+then
+	echo "GPUCHANGE: Set GPU and actual GPU are the same. No reboot required."
+else
+	touch "$gpunew"
+	echo "$changed" > "$gpunew"
+	echo "GPUCHANGE: Please reboot to activate the changes"
+fi
+
+exit 0

@@ -1,0 +1,12 @@
+Section "Device"
+	Identifier	"9400M"
+	Driver		"nvidia"
+	VendorName	"NVIDIA Corporation"
+	BusID 		"PCI:3:0:0"
+#	Option		"CustomEDID" "DFP-1:/etc/X11/samsung_wo_ext.bin"
+#	Option		"IgnoreEDID" "false"
+	Option		"NoLogo"	"1"
+	Option		"RegistryDwords" "PowerMizerLevelAC=0x0; PowerMizerLevel=0x3"
+#	Option		"ProbeAllGpus" "false"
+#	Option		"OnDemandVBlankInterrupts" "true"
+EndSection

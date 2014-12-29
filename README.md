@@ -7,7 +7,7 @@ copy everything as root to your root directory
 
 so what's in here?
 
-/sbin/igd
+/sbin/igd<br>
 switches the gmux to the 9400M and disables the 9600M GT
 
 /sbin/dgd
